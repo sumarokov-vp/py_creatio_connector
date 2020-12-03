@@ -1,16 +1,33 @@
 import json
 import requests
 
+
+
+# CREATIO_URL = 'http://crm.dragonmoney.vn'
+# ODATA_VERSION = 3
+
 SERVICE_LINKS = {
     '3': '/0/ServiceModel/EntityDataService.svc',
     '4': '/0/odata'
 }
 
-HEADERS_TEMPLATE = {
+HEADERS_V3_TEMPLATE = {
+    'Content-Type':'application/json;odata=verbose',
+    'ForceUseSession':'true',
+    'Accept':'application/json;odata=verbose',
+    'BPMCSRF': '',
+}
+
+HEADERS_V4_TEMPLATE = {
     'Content-Type':'application/json; charset=utf-8',
     'ForceUseSession':'true',
     'Accept':'application/json; charset=utf-8',
     'BPMCSRF': '',
+}
+
+HEADERS_SET = {
+    '3': HEADERS_V3_TEMPLATE,
+    '4': HEADERS_V4_TEMPLATE
 }
 
 
@@ -24,12 +41,12 @@ class Creatio():
         self.creatio_url = creatio_host
         self.odata_version: str = odata_version
         self.odata_service_link = self.creatio_url + SERVICE_LINKS[self.odata_version]
-        self.headers = HEADERS_TEMPLATE
-        self.cookies = self.forms_auth(login, password)
+        self.headers = HEADERS_SET[self.odata_version]
+        self.forms_auth(login, password)
         self.headers['BPMCSRF'] = self.cookies['BPMCSRF']
 
     def forms_auth(self, login, password):
-        """ ODATA authentication """
+        """ Аутентификация ODATA """
         url = f'{self.creatio_url}/ServiceModel/AuthService.svc/Login'
         dict_data = {
             "UserName": login,
@@ -37,7 +54,8 @@ class Creatio():
         }
         json_data = json.dumps(dict_data)
         response = requests.post(url=url, headers=self.headers, data= json_data)
-        return response.cookies
+        self.cookies = response.cookies
+        return
 
     def create_object(self, object_name, data):
         """ CREATE запрос в Creatio """
@@ -95,7 +113,7 @@ class Creatio():
             'UsrTerm':str(term),
             #'UsrPhoneNumberValidated':cu.verification_passed
         }
-        return self.create_object(RECEIPT_OBJECT_NAME, dict_data)
+        return self.create_object(LEAD_OBJECT_NAME, dict_data)
 
     def delete_receipt(self, receipt_creatio_id):
         status_code: int = self.delete_object(RECEIPT_OBJECT_NAME, receipt_creatio_id)
