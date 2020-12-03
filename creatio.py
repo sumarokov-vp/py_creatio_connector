@@ -42,7 +42,7 @@ class Creatio():
         self.odata_version: str = odata_version
         self.odata_service_link = self.creatio_url + SERVICE_LINKS[self.odata_version]
         self.headers = HEADERS_SET[self.odata_version]
-        self.forms_auth(login, password)
+        self.cookies = self.forms_auth(login, password)
         self.headers['BPMCSRF'] = self.cookies['BPMCSRF']
 
     def forms_auth(self, login, password):
@@ -54,8 +54,7 @@ class Creatio():
         }
         json_data = json.dumps(dict_data)
         response = requests.post(url=url, headers=self.headers, data= json_data)
-        self.cookies = response.cookies
-        return
+        return response.cookies
 
     def create_object(self, object_name, data):
         """ CREATE запрос в Creatio """
