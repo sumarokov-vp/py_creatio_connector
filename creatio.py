@@ -35,6 +35,7 @@ RECEIPT_OBJECT_NAME = 'SLReceipt'
 TASK_OBJECT_NAME = 'SLReceiptTask'
 DESK_OBJECT_NAME = 'SLTrelloDesks'
 LEAD_OBJECT_NAME = 'Lead'
+PHONE_BOOK_OBJECT_NAME = 'UsrPhoneBook'
 
 class Creatio():
     def __init__(self, creatio_host, login, password, odata_version):
@@ -113,6 +114,14 @@ class Creatio():
             #'UsrPhoneNumberValidated':cu.verification_passed
         }
         return self.create_object(LEAD_OBJECT_NAME, dict_data)
+    
+    def post_phone_book(self, full_name, lead_id, phone_number):
+        dict_data = {
+            'UsrFullName': full_name,
+            'UsrLeadId': lead_id,
+            'UsrNumber': phone_number,
+        }     
+        return self.create_object(PHONE_BOOK_OBJECT_NAME, dict_data)
 
     def delete_receipt(self, receipt_creatio_id):
         status_code: int = self.delete_object(RECEIPT_OBJECT_NAME, receipt_creatio_id)
