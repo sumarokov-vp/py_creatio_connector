@@ -164,3 +164,21 @@ class Creatio():
             )
             array = json.loads(response.content)['value']
         return len(array)
+    
+    def get_first_object(self, object_name: str, field:str, value: str, order_by: str, order_asc: bool):
+        if self.odata_version == '3':
+            if order_asc:
+                asc = 'asc'
+            else:
+                asc = 'desc'
+            
+            url = self.odata_service_link + f"/{object_name}Collection?$filter={field} eq '{value}'&$orderby= {order_by} {asc}"
+        else:
+            url = self.odata_service_link + f"/{object_name}?$filter={field} eq '{value}'"
+        response = requests.get(
+            url=url,
+            headers=self.headers,
+            cookies= self.cookies,
+        )
+        result = json.loads(response.content)['d']
+        return result
