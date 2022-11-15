@@ -8,7 +8,8 @@ import requests
 
 SERVICE_LINKS = {
     '3': '/0/ServiceModel/EntityDataService.svc',
-    '4': '/0/odata'
+    '4': '/0/odata',
+    '4core': '/odata'
 }
 
 HEADERS_V3_TEMPLATE = {
@@ -27,7 +28,8 @@ HEADERS_V4_TEMPLATE = {
 
 HEADERS_SET = {
     '3': HEADERS_V3_TEMPLATE,
-    '4': HEADERS_V4_TEMPLATE
+    '4': HEADERS_V4_TEMPLATE,
+    '4core': HEADERS_V4_TEMPLATE
 }
 
 
@@ -38,7 +40,7 @@ LEAD_OBJECT_NAME = 'Lead'
 PHONE_BOOK_OBJECT_NAME = 'UsrPhoneBook'
 
 class Creatio():
-    def __init__(self, creatio_host, login, password, odata_version):
+    def __init__(self, creatio_host, login, password, odata_version: str):
         self.creatio_url = creatio_host
         self.odata_version: str = odata_version
         self.odata_service_link = self.creatio_url + SERVICE_LINKS[self.odata_version]
