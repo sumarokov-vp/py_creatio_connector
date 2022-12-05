@@ -1,16 +1,12 @@
 import json
 import requests
+from enum import Enum
 
 
 
 # CREATIO_URL = 'http://crm.dragonmoney.vn'
 # ODATA_VERSION = 3
 
-SERVICE_LINKS = {
-    '3': '/0/ServiceModel/EntityDataService.svc',
-    '4': '/0/odata',
-    '4core': '/odata'
-}
 
 HEADERS_V3_TEMPLATE = {
     'Content-Type':'application/json;odata=verbose',
@@ -26,25 +22,41 @@ HEADERS_V4_TEMPLATE = {
     'BPMCSRF': '',
 }
 
-HEADERS_SET = {
-    '3': HEADERS_V3_TEMPLATE,
-    '4': HEADERS_V4_TEMPLATE,
-    '4core': HEADERS_V4_TEMPLATE
-}
-
-
 RECEIPT_OBJECT_NAME = 'SLReceipt'
 TASK_OBJECT_NAME = 'SLReceiptTask'
 DESK_OBJECT_NAME = 'SLTrelloDesks'
 LEAD_OBJECT_NAME = 'Lead'
 PHONE_BOOK_OBJECT_NAME = 'UsrPhoneBook'
 
+
+
+        
+
+class ODATA_version(Enum):
+    v3= {
+            'service_path': '/0/ServiceModel/EntityDataService.svc',
+            'headers': HEADERS_V3_TEMPLATE,
+        }
+    v4= {
+            'service_path': '/0/odata',
+            'headers': HEADERS_V4_TEMPLATE,
+        }
+    v4core= {
+            'service_path': '/odata',
+            'headers': HEADERS_V4_TEMPLATE,
+        }
+    test = {
+            'service_path': '/0/ServiceModel/EntityDataService.svc',
+            'headers': 'test',
+        }
+    
+
 class Creatio():
-    def __init__(self, creatio_host, login, password, odata_version: str):
+    def __init__(self, creatio_host, login, password, odata_version):
         self.creatio_url = creatio_host
-        self.odata_version: str = odata_version
-        self.odata_service_link = self.creatio_url + SERVICE_LINKS[self.odata_version]
-        self.headers = HEADERS_SET[self.odata_version]
+        self.odata_version = odata_version
+        self.odata_service_link = self.creatio_url + odata_version.value['service_path']
+        self.headers = odata_version.value['headers']
         self.cookies = self.forms_auth(login, password)
         self.headers['BPMCSRF'] = self.cookies['BPMCSRF']
 
@@ -184,3 +196,11 @@ class Creatio():
         )
         result = json.loads(response.content)['d']
         return result
+if __name__ == '__main__':
+    cr = Creatio(
+        creatio_host= 'http://creatio.simplelogic.ru:5000',
+        login = 'Vova',
+        password= '9#zgr@ci6!bveH',
+        odata_version= ODATA_version.v4core
+    )
+    assert(cr.receipt_tasks_count('904aba88-bea9-4425-8bdd-b1584ffb0d63') == 1)

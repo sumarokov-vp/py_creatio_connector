@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "sl-creatio-connector"
+version = "0.1.0"
+description = "Creatio (aka BPMonline) ODATA API helper"
+authors = ["sumarokov-vp <sumarokov.vp@gmail.com>"]
+readme = "README.md"
+packages = [{include = "sl_creatio_connector"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+requests = "^2.28.1"
+pytest = "^7.2.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
