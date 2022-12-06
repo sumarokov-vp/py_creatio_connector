@@ -1,7 +1,7 @@
 import json
 import requests
 from enum import Enum
-
+from os import getenv
 
 
 # CREATIO_URL = 'http://crm.dragonmoney.vn'
@@ -57,8 +57,12 @@ class Creatio():
         self.odata_version = odata_version
         self.odata_service_link = self.creatio_url + odata_version.value['service_path']
         self.headers = odata_version.value['headers']
-        self.cookies = self.forms_auth(login, password)
-        self.headers['BPMCSRF'] = self.cookies['BPMCSRF']
+        done, text = self.forms_auth(login, password)
+        if done:
+            self.headers['BPMCSRF'] = text['BPMCSRF']
+            self.cookies = text
+        else:
+            raise Exception(text)
 
     def forms_auth(self, login, password):
         """ Аутентификация ODATA """
@@ -69,7 +73,12 @@ class Creatio():
         }
         json_data = json.dumps(dict_data)
         response = requests.post(url=url, headers=self.headers, data= json_data)
-        return response.cookies
+
+        response_data = response.json()
+        if response_data['Code'] == 0:
+            return True, response.cookies
+        else:
+            return False, response_data['Message']
 
     def create_object(self, object_name, data):
         """ CREATE запрос в Creatio """
@@ -155,7 +164,7 @@ class Creatio():
 
     def receipt_tasks_count(self, receipt_creatio_id):
         """ Количество тасков в рецепте в Creatio """
-        if self.odata_version == '3':
+        if self.odata_version == ODATA_version.v3:
             url = (
                 f"{self.odata_service_link}/{TASK_OBJECT_NAME}Collection" +
                 f"?$filter={RECEIPT_OBJECT_NAME}/Id eq guid'{receipt_creatio_id}'"
@@ -179,28 +188,30 @@ class Creatio():
             array = json.loads(response.content)['value']
         return len(array)
     
-    def get_first_object(self, object_name: str, field:str, value: str, order_by: str, order_asc: bool):
-        if self.odata_version == '3':
+    def get_object(self, object_name: str, field:str, value: str, order_by: str, order_asc: bool = True):
+        """
+            Object collection using filter
+            doesnt support Id columns
+        """
+        if self.odata_version == ODATA_version.v3:
             if order_asc:
                 asc = 'asc'
             else:
                 asc = 'desc'
-            
+             
             url = self.odata_service_link + f"/{object_name}Collection?$filter={field} eq '{value}'&$orderby= {order_by} {asc}"
+            response = requests.get(
+                url=url,
+                headers=self.headers,
+                cookies= self.cookies,
+            )
+            result = json.loads(response.content)['d']['results']
         else:
             url = self.odata_service_link + f"/{object_name}?$filter={field} eq '{value}'"
-        response = requests.get(
-            url=url,
-            headers=self.headers,
-            cookies= self.cookies,
-        )
-        result = json.loads(response.content)['d']
+            response = requests.get(
+                url=url,
+                headers=self.headers,
+                cookies= self.cookies,
+            )
+            result = json.loads(response.content)['value']
         return result
-if __name__ == '__main__':
-    cr = Creatio(
-        creatio_host= 'http://creatio.simplelogic.ru:5000',
-        login = 'Vova',
-        password= '9#zgr@ci6!bveH',
-        odata_version= ODATA_version.v4core
-    )
-    assert(cr.receipt_tasks_count('904aba88-bea9-4425-8bdd-b1584ffb0d63') == 1)
