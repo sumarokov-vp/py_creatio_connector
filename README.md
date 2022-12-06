@@ -28,6 +28,27 @@ def get_leads():
         order_by='Contact',
     )
 
+def create_lead():
+    creatio = Creatio(
+        creatio_host= CREATIO_HOST,
+        login= CREATIO_LOGIN,
+        password= CREATIO_PASS,
+        odata_version= ODATA_version.v3
+    )
+
+    dict_data = {
+        'Contact': cu.name,
+        'MobilePhone': cu.mobile_phone,
+        'RegisterMethodId': db_worker.get_setting('new_lead_register_method'),
+        'CountryId': db_worker.get_setting('creatio_country_id'),
+        'QualifyStatusId': db_worker.get_setting('new_lead_stage'),
+        'UsrActivityResultId': db_worker.get_setting('new_lead_activity_result'),
+        'UsrMoneyAmount': cu.lead_amount,
+        'UsrTerm':str(cu.lead_term),
+    }
+    lead = creatio.create_object('Lead', dict_data)
+
+
 
 if __name__ == '__main__':
     get_leads()

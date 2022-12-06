@@ -25,7 +25,6 @@ HEADERS_V4_TEMPLATE = {
 RECEIPT_OBJECT_NAME = 'SLReceipt'
 TASK_OBJECT_NAME = 'SLReceiptTask'
 DESK_OBJECT_NAME = 'SLTrelloDesks'
-LEAD_OBJECT_NAME = 'Lead'
 PHONE_BOOK_OBJECT_NAME = 'UsrPhoneBook'
 
 
@@ -82,7 +81,7 @@ class Creatio():
 
     def create_object(self, object_name, data):
         """ CREATE запрос в Creatio """
-        if self.odata_version =='3':
+        if self.odata_version == ODATA_version.v3:
             url = self.odata_service_link + f"/{object_name}Collection"
         else:
             url = self.odata_service_link + f"/{object_name}"
@@ -94,17 +93,17 @@ class Creatio():
             cookies= self.cookies,
         )
 
-        if self.odata_version =='3':
-            object_id = json.loads(response.content)['d']['Id']
+        if self.odata_version == ODATA_version.v3:
+            object = json.loads(response.content)['d']
         else:
-            object_id = json.loads(response.content)['Id']
+            object = json.loads(response.content)
 
-        return object_id
+        return object
 
 
     def delete_object(self, object_name: str, object_id: str):
         """ DELETE запрос к Creatio """
-        if self.odata_version == '3':
+        if self.odata_version == ODATA_version.v3:
             url = self.odata_service_link + f"/{object_name}Collection(guid'{object_id}')"
         else:
             url = self.odata_service_link + f"/{object_name}({object_id})"
@@ -123,20 +122,18 @@ class Creatio():
         }
         return self.create_object(RECEIPT_OBJECT_NAME, dict_data)
     
-    def post_lead(self, register_method, country, lead_stage, activity_result, full_name, mobile_phone, amount, term):
-        """ Create Lead instance in Creatio """
+    def create_message_log_sms(
+        self,
+        mobie_phone,
+        text,
+    ):
         dict_data = {
-            'Contact': full_name,
-            'MobilePhone': mobile_phone,
-            'RegisterMethodId': register_method,
-            'CountryId': country,
-            'QualifyStatusId': lead_stage,
-            'UsrActivityResultId': activity_result,
-            'UsrMoneyAmount': amount,
-            'UsrTerm':str(term),
-            #'UsrPhoneNumberValidated':cu.verification_passed
+            'Address': mobie_phone,
+            'Text': text,
+            'MessageChannelId': 'F7135347-9F65-4573-B409-6ADA0C47ADB6' # SMS
         }
-        return self.create_object(LEAD_OBJECT_NAME, dict_data)
+        return self.create_object('MessageLog', data=dict_data)
+
     
     def post_phone_book(self, full_name, lead_id, phone_number):
         dict_data = {
@@ -215,3 +212,57 @@ class Creatio():
             )
             result = json.loads(response.content)['value']
         return result
+
+    def get_contact_by_id(self, contact_id):
+        if contact_id == None: return None
+        if self.odata_version == ODATA_version.v3:
+            # url = self.odata_service_link + f"/ContactCollection(guid'{contact_id}')?$select=UsrTotalLoansCount, MobilePhone, UsrOpenedLoansCount, Name, Id"
+            url = self.odata_service_link + f"/ContactCollection(guid'{contact_id}')"
+            response = requests.get(
+                url=url,
+                headers=self.headers,
+                cookies= self.cookies,
+            )
+            result = json.loads(response.content)['d']
+        elif self.odata_version == ODATA_version.v4core or self.odata_version == ODATA_version.v4:
+            url = self.odata_service_link + f"/Contact({contact_id})"
+            response = requests.get(
+                url=url,
+                headers=self.headers,
+                cookies= self.cookies,
+            )
+            result = json.loads(response.content)
+        else: result = None
+
+        return result
+
+    def get_creatio_contact_id(self, creatio_channel_id, number):
+        if self.odata_version == ODATA_version.v3:
+            url = self.odata_service_link + f"/ContactCommunicationCollection?$filter=CommunicationType/Id eq guid'{creatio_channel_id}' and Number eq '{number}'"
+            response = requests.get(
+                url=url,
+                headers=self.headers,
+                cookies= self.cookies,
+            )
+            result = json.loads(response.content)['d']
+            try:
+                result = result[0]['ContactId']
+            except:
+                result = None
+        elif self.odata_version == ODATA_version.v4core or self.odata_version == ODATA_version.v4:
+            url = self.odata_service_link + f"/ContactCommunication?$filter=CommunicationType/Id eq {creatio_channel_id} and Number eq '{number}'"
+            response = requests.get(
+                url=url,
+                headers=self.headers,
+                cookies= self.cookies,
+            )
+            result = json.loads(response.content)
+            try:
+                result = result[0]['ContactId']
+            except:
+                result = None
+        else: result = None
+
+        return result
+
+    
