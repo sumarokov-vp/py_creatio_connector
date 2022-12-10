@@ -16,7 +16,8 @@
             "name": "pytest",
             "type": "python",
             "request": "launch",
-            "module": "sl_creatio_connector.tests.test_create_class",
+            // "module": "test_create_class",
+            "program": "sl_creatio_connector/test_main.py",
             "console": "integratedTerminal",
             "justMyCode": true
         },

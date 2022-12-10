@@ -1,4 +1,5 @@
-from py_creatio_connector.sl_creatio_connector.creatio import ODATA_version, Creatio
+from constants import ODATA_version
+from creatio import Creatio
 import pytest
 from os import getenv
 

@@ -1,5 +1,6 @@
 # <p align="center">Simple logic's Creatio ODATA connector</p>
 <p align="center">Connector to integrate <a href="https://academy.creatio.com/docs/developer/integrations_and_api/data_services/odata/overview">Creatio ODATA API</a>.</p>
+<p><a href="https://documenter.getpostman.com/view/10204500/SztHX5Qb">Creatio ODATA API postman documentation</a></p>
 
 ## Getting started
 
@@ -9,7 +10,7 @@ This connector tested for ODATA3 and ODATA4 protocols (including .net core versi
 $ pip install sl_creatio_connector
 ```
 
-## Using connector
+## Quick start
 
 ```python
 from creatio import Creatio
@@ -54,3 +55,16 @@ if __name__ == '__main__':
     get_leads()
 
 ```
+## General documentation
+
+### Types
+
+        `ODATA_version` - Enumerator for different ODATA protocol versions
+
+### Methods
+
+#### "Creatio" class constructor
+
+#### get_object
+
+
