@@ -17,7 +17,7 @@
             "type": "python",
             "request": "launch",
             // "module": "test_create_class",
-            "program": "sl_creatio_connector/test_main.py",
+            "program": "tests/test_main.py",
             "console": "integratedTerminal",
             "justMyCode": true
         },
