@@ -14,38 +14,49 @@ $ pip install sl_creatio_connector
 
 from sl_creatio_connector.creatio import Creatio
 from sl_creatio_connector.constants import ODATA_version
-from os import getenv
 
-def test_get_contact_leads_v4():
+# get collection
+def get_contact_leads():
     cr = Creatio(
-        creatio_host='http://creatio.simplelogic.ru:5000',
-        login='Vova',
-        password=getenv('SL_CREATIO_PASS'),  # export SL_CREATIO_PASS="my_massword"
+        creatio_host='http://creatio.mydomen.com:5000',
+        login='Supervisor',
+        password='Supervisor',
         odata_version=ODATA_version.v4core
     )
     parameters = [
         "filter=Contact eq 'Marady Esther'"
     ]
     collection = cr.get_object_collection(
-        object_name='Lead',
+        object_name= 'Lead',
         parameters= parameters,
     )
     assert len(collection) == 0
 
-test_get_contact_leads_v4()
+def create_and_delete_contact():
+    cr = Creatio(
+        creatio_host='http://creatio.mydomen.com:5000',
+        login='Supervisor',
+        password='Supervisor',
+        odata_version=ODATA_version.v4core
+    )
+    data = {
+        'Name': "Test name"
+    }
+    created_contact = cr.create_object(
+        object_name= 'Contact',
+        data= data,
+    )
+    created_id = created_contact['Id']
+    status_code = cr.delete_object('Contact', created_id).status_code
 
-
+def get_contact_by_id():
+    cr = Creatio(
+        creatio_host='http://creatio.mydomen.com:5000',
+        login='Supervisor',
+        password='Supervisor',
+        odata_version=ODATA_version.v4core
+    )
+    contact_dict = cr.get_contact_by_id('b2a8c568-002f-4fd1-a15a-ffda98f5f63b')
 ```
-## General documentation
-
-### Types
-
-        `ODATA_version` - Enumerator for different ODATA protocol versions
-
-### Methods
-
-#### "Creatio" class constructor
-
-#### get_object
 
 
