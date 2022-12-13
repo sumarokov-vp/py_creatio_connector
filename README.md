@@ -11,21 +11,30 @@ $ pip install sl_creatio_connector
 ```
 
 ```python
-from creatio import Creatio
 
-cr = Creatio(
-    creatio_host='http://creatio.simplelogic.ru:5000',
-    login='Vova',
-    password=getenv('SL_CREATIO_PASS'),  # export SL_CREATIO_PASS="my_massword"
-    odata_version=ODATA_version.v4core
-)
-parameters = [
-    "filter=Contact eq 'Marady Esther'"
-]
-collection = cr.get_object_collection(
-    object_name='Lead',
-    parameters= parameters,
-)
+from sl_creatio_connector.creatio import Creatio
+from sl_creatio_connector.constants import ODATA_version
+from os import getenv
+
+def test_get_contact_leads_v4():
+    cr = Creatio(
+        creatio_host='http://creatio.simplelogic.ru:5000',
+        login='Vova',
+        password=getenv('SL_CREATIO_PASS'),  # export SL_CREATIO_PASS="my_massword"
+        odata_version=ODATA_version.v4core
+    )
+    parameters = [
+        "filter=Contact eq 'Marady Esther'"
+    ]
+    collection = cr.get_object_collection(
+        object_name='Lead',
+        parameters= parameters,
+    )
+    assert len(collection) == 0
+
+test_get_contact_leads_v4()
+
+
 ```
 ## General documentation
 
