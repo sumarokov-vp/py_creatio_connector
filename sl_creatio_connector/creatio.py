@@ -1,7 +1,7 @@
 import json
 import requests
 from enum import Enum
-from sl_creatio_connector.constants import ODATA_version, OrderDirection, FilterOperators
+from sl_creatio_connector.constants import ODATA_version
 from typing import List
 
 class Creatio():

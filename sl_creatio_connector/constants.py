@@ -34,14 +34,3 @@ class ODATA_version(Enum):
             'service_path': '/0/ServiceModel/EntityDataService.svc',
             'headers': 'test',
         }
-
-class OrderDirection(Enum):
-    """
-        Order direction enum ( ascernding or descending)
-    """
-    ascending = 'asc'
-    descending = 'desc'
-
-class FilterOperators(Enum):
-    and_operator = 'and'
-    or_operator = 'or'
