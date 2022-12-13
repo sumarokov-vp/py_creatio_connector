@@ -1,4 +1,4 @@
-# <p align="center">Simple logic's Creatio ODATA connector</p>
+# <p align="center">Creatio ODATA connector</p>
 <p align="center">Connector to integrate <a href="https://academy.creatio.com/docs/developer/integrations_and_api/data_services/odata/overview">Creatio ODATA API</a>.</p>
 <p><a href="https://documenter.getpostman.com/view/10204500/SztHX5Qb">Creatio ODATA API postman documentation</a></p>
 
