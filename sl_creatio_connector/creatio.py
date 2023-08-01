@@ -47,11 +47,15 @@ class Creatio():
             data= json_data,
             cookies= self.cookies,
         )
-
-        if self.odata_version == ODATA_version.v3:
-            object = json.loads(response.content)['d']
-        else:
-            object = json.loads(response.content)
+        try:
+            error = json.loads(response.content)['error']
+            print(f'!!!!   {response.content=}')
+            object = {'error': error}
+        except:
+            if self.odata_version == ODATA_version.v3:
+                object = json.loads(response.content)['d']
+            else:
+                object = json.loads(response.content)
 
         return object
 
