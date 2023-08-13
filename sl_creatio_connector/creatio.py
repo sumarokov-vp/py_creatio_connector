@@ -49,7 +49,8 @@ class Creatio():
         )
         try:
             error = json.loads(response.content)['error']
-            print(f'!!!!   {response.content=}')
+
+            print(f'\nCreating object error \n Request:\n{json_data}\nResponse:\n{response.content=}')
             object = {'error': error}
         except:
             if self.odata_version == ODATA_version.v3:
