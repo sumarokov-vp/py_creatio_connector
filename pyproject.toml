@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sl-creatio-connector"
-version = "0.1.5"
+version = "0.1.6"
 description = "Creatio (aka BPMonline) ODATA API helper"
 authors = ["sumarokov-vp <sumarokov.vp@gmail.com>"]
 readme = "README.md"
